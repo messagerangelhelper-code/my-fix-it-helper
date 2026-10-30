@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { pointTo } from "./highlight.js";
 import { BRAND, storesFor, storeLink, prosFor, PARTNERS } from "./brand.js";
 import { CATEGORIES, FIXES, CHECKLIST, REMINDER_PRESETS, searchFixes, fixById, periodKey, seasonOf } from "./fixes.js";
 import { loadData, saveData } from "./storage.js";
@@ -77,6 +78,7 @@ export default function App() {
   }, [toast]);
 
   const results = useMemo(() => searchFixes(query), [query]);
+  const answerRef = useRef(null);
   const listCount = data.list.filter((i) => !i.got).length;
   const today = isoLocal();
   const reminders = data.reminders || [];
@@ -185,7 +187,7 @@ export default function App() {
 
           {f.tools.length > 0 && (
             <>
-              <h2>Tools</h2>
+              <h2>🧰 Tools</h2>
               <ul className="plain">{f.tools.map((t) => <li key={t}>{t}</li>)}</ul>
             </>
           )}
@@ -193,7 +195,7 @@ export default function App() {
           {f.parts.length > 0 && (
             <>
               <div className="row-between">
-                <h2>Shopping list</h2>
+                <h2>🛒 Shopping list</h2>
                 <button type="button" className="link" onClick={() => addAllParts(f)}>+ Add all to my list</button>
               </div>
               <ul className="parts">
@@ -211,7 +213,7 @@ export default function App() {
             </>
           )}
 
-          <h2>Steps</h2>
+          <h2 className="hl">👉 Steps</h2>
           <ol className="steps">{f.steps.map((s) => <li key={s}>{s}</li>)}</ol>
 
           <div className="pro">
@@ -479,7 +481,9 @@ export default function App() {
           <h1>What needs fixing?</h1>
           <p className="muted">{BRAND.tagline}</p>
           <label className="sr-only" htmlFor="q">Search fixes</label>
-          <input id="q" type="search" value={query} placeholder="Try: toilet keeps running" onChange={(e) => setQuery(e.target.value)} autoComplete="off" />
+          <form role="search" onSubmit={(e) => { e.preventDefault(); e.target.querySelector("input").blur(); pointTo(answerRef.current); }}>
+            <input id="q" type="search" enterKeyHint="search" value={query} placeholder="Try: toilet keeps running" onChange={(e) => setQuery(e.target.value)} autoComplete="off" />
+          </form>
         </section>
 
         <div className="gas-banner" role="note">
@@ -487,8 +491,9 @@ export default function App() {
         </div>
 
         {query.trim() ? (
-          <section>
-            <h2 className="section-title">{results.length ? `Fixes for "${query.trim()}"` : `No fix found for "${query.trim()}"`}</h2>
+          <section ref={answerRef} className="card answer" aria-live="polite">
+            <p className="answer-tag">👉 Your answer</p>
+            <h2 className="section-title">{results.length ? `${results.length} ${results.length === 1 ? "fix" : "fixes"} for "${query.trim()}"` : `No fix found for "${query.trim()}"`}</h2>
             {results.length ? <ul className="fix-list">{results.map((f) => <FixCard key={f.id} f={f} />)}</ul> : (
               <p className="card muted">Try other words, like "leak", "clog", "door" or "battery", or browse below. For anything with gas, the breaker panel or the roof, call a pro.</p>
             )}
