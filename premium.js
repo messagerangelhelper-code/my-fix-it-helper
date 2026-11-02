@@ -1,28 +1,33 @@
-// Premium for My Fix-It Helper, paid through CashCow (Stripe checkout).
+// Premium for My Home Kitchen Remedies, paid through CashCow (Stripe checkout).
 // After paying, Stripe sends the person back here with ?session_id=..., and the
 // app asks CashCow whether that purchase is paid (and, for subscriptions, still active).
 // Premium is remembered on this phone; it's re-checked every few days.
 import { currentToken } from "./account.js";
 
 const API = "https://cashcow-reviews-api.onrender.com";
-const APP = "fixit";
-const KEY = "mfh-premium";
+const APP = "homeremedy";
+const KEY = "mhkr-premium";
 const RECHECK_MS = 3 * 24 * 60 * 60 * 1000;
 
+// CashCow All Access: Premium in every CashCow app, including ScamShield Premium.
+// Needs a signed-in CashCow account, so it can unlock every app you sign in to.
+export const ALL_ACCESS = [
+  { id: "rent", label: "Monthly", price: "$29", per: "/month" },
+  { id: "lease", label: "Yearly", price: "$249", per: "/year", note: "Save 28%" },
+  { id: "buy", label: "Lifetime", price: "$499", per: "one time", note: "Pay once" },
+];
+
 export const PLANS = [
-  { id: "fih_monthly", label: "Monthly", price: "$1.99", per: "/month" },
-  { id: "fih_yearly", label: "Yearly", price: "$14.99", per: "/year", note: "Save 37%", best: true },
-  { id: "fih_lifetime", label: "Lifetime", price: "$29.99", per: "one time", note: "Pay once" },
+  { id: "hkr_monthly", label: "Monthly", price: "$1.99", per: "/month" },
+  { id: "hkr_yearly", label: "Yearly", price: "$14.99", per: "/year", note: "Save 37%", best: true },
+  { id: "hkr_lifetime", label: "Lifetime", price: "$29.99", per: "one time", note: "Pay once" },
 ];
 
 export const PREMIUM_FEATURES = [
-  "My Home: save fixes as projects and track them from planned to done",
-  "Repair log: what was fixed, when, by whom and what it cost",
-  "Home reminders: filters, smoke alarms, gutters and more, flagged when they're due",
+  "My Remedies: save your favorites",
+  "My Kitchen: tick what you have and see what you can make right now",
+  "Shopping list for the remedies you want to try",
 ];
-
-export const PREMIUM_THANKS = "My Home is unlocked: projects, your repair log and home reminders.";
-export const PREMIUM_FREE_NOTE = "Every fix, the shopping list and the seasonal checklist are free. Premium adds My Home:";
 
 function read() {
   try {
@@ -149,7 +154,7 @@ export async function startCheckout(planId) {
     res = await fetch(`${API}/api/create-checkout-session`, {
       method: "POST",
       headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-      body: JSON.stringify({ plan: planId }),
+      body: JSON.stringify({ plan: planId, return_app: APP }),
     });
   } catch {
     throw new Error("Couldn't reach checkout. Check your connection and try again.");
