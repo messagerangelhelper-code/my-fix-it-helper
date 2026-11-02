@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ALL_ACCESS, PLANS, PREMIUM_FEATURES, startCheckout } from "./premium.js";
+import { ALL_ACCESS, PLANS, PREMIUM_FEATURES, PREMIUM_THANKS, PREMIUM_FREE_NOTE, startCheckout } from "./premium.js";
 
 // Plans and upgrade buttons. Payment happens on Stripe's secure checkout page.
 export default function Premium({ premium, onBack }) {
@@ -21,8 +21,8 @@ export default function Premium({ premium, onBack }) {
     return (
       <section className="card premium-card">
         <h2>You're on Premium ✅</h2>
-        <p>Thank you! My Remedies, My Kitchen and the shopping list are unlocked.</p>
-        <button type="button" className="btn-primary" onClick={onBack}>Back to remedies</button>
+        <p>Thank you! {PREMIUM_THANKS}</p>
+        <button type="button" className="btn-primary" onClick={onBack}>Back</button>
       </section>
     );
   }
@@ -30,7 +30,7 @@ export default function Premium({ premium, onBack }) {
   return (
     <section className="card premium-card">
       <h2>Go Premium</h2>
-      <p className="muted">Every remedy, with its safety checks and sources, stays free. Premium adds:</p>
+      <p className="muted">{PREMIUM_FREE_NOTE}</p>
       <ul className="premium-list">
         {PREMIUM_FEATURES.map((f) => <li key={f}>{f}</li>)}
       </ul>

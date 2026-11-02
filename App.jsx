@@ -90,14 +90,14 @@ export default function App() {
   function addPart(fix, part) {
     if (data.list.some((i) => i.q === part.q && i.kind === fix.kind && !i.got)) return setToast("Already on your list.");
     update((d) => ({ ...d, list: [...d.list, { id: uid(), name: part.name, q: part.q, kind: fix.kind, fix: fix.id, got: false }] }));
-    setToast("Added to your shopping list.");
+    setToast("Added to your parts & supplies list.");
   }
   function addAllParts(fix) {
     const have = new Set(data.list.filter((i) => !i.got).map((i) => `${i.kind}:${i.q}`));
     const fresh = fix.parts.filter((p) => !have.has(`${fix.kind}:${p.q}`));
     if (!fresh.length) return setToast("Already on your list.");
     update((d) => ({ ...d, list: [...d.list, ...fresh.map((p) => ({ id: uid(), name: p.name, q: p.q, kind: fix.kind, fix: fix.id, got: false }))] }));
-    setToast(`Added ${fresh.length} ${fresh.length === 1 ? "item" : "items"} to your shopping list.`);
+    setToast(`Added ${fresh.length} ${fresh.length === 1 ? "item" : "items"} to your parts & supplies list.`);
   }
   function saveProject(fix) {
     if (!premium) return go("premium");
@@ -124,8 +124,8 @@ export default function App() {
   }
   async function shareList() {
     const items = data.list.filter((i) => !i.got);
-    const text = `Shopping list from ${BRAND.name}:\n${items.map((i) => `• ${i.name}`).join("\n")}`;
-    if (navigator.share) { try { await navigator.share({ title: "Shopping list", text }); return; } catch { /* cancelled */ } }
+    const text = `Parts & supplies list from ${BRAND.name}:\n${items.map((i) => `• ${i.name}`).join("\n")}`;
+    if (navigator.share) { try { await navigator.share({ title: "Parts & supplies list", text }); return; } catch { /* cancelled */ } }
     try { await navigator.clipboard.writeText(text); setToast("List copied. Paste it into a text or note."); } catch { setToast("Couldn't copy on this browser."); }
   }
 
@@ -158,7 +158,7 @@ export default function App() {
             <input type="checkbox" checked={!!data.bigText} onChange={(e) => update((d) => ({ ...d, bigText: e.target.checked }))} />
             <span>Bigger text</span>
           </label>
-          <p className="muted small">Your shopping list, checklist and My Home are saved on this phone.</p>
+          <p className="muted small">Your parts & supplies list, checklist and My Home are saved on this phone.</p>
         </section>
         <Account premium={premium} />
       </>
@@ -195,7 +195,7 @@ export default function App() {
           {f.parts.length > 0 && (
             <>
               <div className="row-between">
-                <h2>🛒 Shopping list</h2>
+                <h2>🔩 Parts &amp; supplies</h2>
                 <button type="button" className="link" onClick={() => addAllParts(f)}>+ Add all to my list</button>
               </div>
               <ul className="parts">
@@ -285,7 +285,7 @@ export default function App() {
         <button type="button" className="link back" onClick={() => go("home")}>← Back</button>
         <section className="card">
           <div className="row-between">
-            <h1>🛒 Shopping list</h1>
+            <h1>🔩 Parts &amp; supplies list</h1>
             {open.length > 0 && <button type="button" className="btn-secondary small-btn" onClick={shareList}>Share</button>}
           </div>
           {data.list.length === 0 && <p className="muted">Your list is empty. Open a fix and tap "+ List" next to a part.</p>}
@@ -508,7 +508,7 @@ export default function App() {
         )}
 
         <nav className="quick-nav" aria-label="Your tools">
-          <button type="button" className="qn" onClick={() => go("list")}><span aria-hidden="true">🛒</span>Shopping list{listCount > 0 && <span className="count">{listCount}</span>}</button>
+          <button type="button" className="qn" onClick={() => go("list")}><span aria-hidden="true">🔩</span>Parts &amp; supplies{listCount > 0 && <span className="count">{listCount}</span>}</button>
           <button type="button" className="qn" onClick={() => go("checklist")}><span aria-hidden="true">✅</span>Home checklist</button>
           <button type="button" className="qn wide" onClick={() => go("myhome")}><span aria-hidden="true">🏠</span>My Home{!premium && <span className="pill-premium">Premium</span>}</button>
         </nav>
